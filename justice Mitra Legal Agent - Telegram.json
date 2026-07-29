@@ -1,0 +1,139 @@
+{
+  "name": "JusticeMitra Legal Agent - Telegram",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "id": "874fe1f2-9315-479d-a19a-67c86a85c251",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "43989d30-5326-4117-9dee-b1fafc357f03",
+      "credentials": {
+        "telegramApi": {
+          "id": "q3jLQdnAYQcn1VFK",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "=You are Justice Mitra, an expert Indian legal triage and drafting assistant.\n\nYour task is to analyze the user's grievance and output a complete legal action plan.\n\n### STEPS TO FOLLOW:\n1. Classify the grievance into EXACTLY ONE track:\n   - RTI Track (government withholding info/files/status)\n   - Consumer Track (defective goods/services from companies)\n   - Criminal Track (theft, assault, fraud, threats, harassment)\n   - Ombudsman Track (banking, insurance, telecom disputes)\n   - Civil Track (property, contract, or personal disputes)\n\n2. NALSA Free Legal Aid Eligibility Notice:\n   - State clearly that free legal aid is available under NALSA Section 12 for Women, Children, SC/ST, Persons with Disabilities, and households with income under ₹3 Lakh/year.\n\n3. Generate a formal, structured legal draft appropriate for the identified track (e.g., RTI Application under Sec 6(1) format, Consumer Notice format, or Police Complaint draft).\n\n4. Provide a 3-step escalation path if the initial response fails.\n\nFORMAT YOUR RESPONSE USING CLEAN MARKDOWN FOR TELEGRAM."
+        }
+      },
+      "id": "d253165a-d10e-480f-bd30-eb12a97ced97",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "parse_mode": "Markdown"
+        }
+      },
+      "id": "9aabaf8a-89c9-42d7-ab03-4e25a76671a5",
+      "name": "Send Reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        512,
+        0
+      ],
+      "webhookId": "e23d2435-f106-490e-8afe-ce353dc5746d",
+      "credentials": {
+        "telegramApi": {
+          "id": "q3jLQdnAYQcn1VFK",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "id": "b350d6f3-67ca-44ba-bc8c-1c8cc4568575",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        112,
+        208
+      ],
+      "credentials": {
+        "groqApi": {
+          "id": "1v6E2lZZAHaQd4um",
+          "name": "Groq account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send Reply",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "44e8eab3-929d-46bc-8aaf-0e971e828d5a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4ecfb846383c584c2022c9c9c73a81b1a85ed35a3056f74bd5bb8d2cd2e25a42"
+  },
+  "nodeGroups": [],
+  "id": "zlKxyo2rEOj4O8Iv",
+  "tags": []
+}
